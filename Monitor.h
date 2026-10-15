@@ -6,39 +6,47 @@
 
 inline void paginaMonitor(EthernetClient &client) {
     String contenido = R"rawliteral(
-        <h1>Monitor de entradas</h1>
+<h1>Monitor de entradas</h1>
 
-        <p>Actualización automática cada 10 segundos.</p>
-
-        <div style="overflow-x:auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Entrada física</th>
-                        <th>Asignación</th>
-                        <th>Valor de entrada</th>
-                        <th>Nombre</th>
-                        <th>Tipo</th>
-                        <th>Offset</th>
-                        <th>Slope</th>
-                        <th>Unidades</th>
-                        <th>Valor real</th>
-                    </tr>
-                </thead>
-                <tbody id="tablaEntradas">
-                    <tr><td colspan="9">Cargando entradas...</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <p id="estadoMonitor">Conectando...</p>
-    )rawliteral";
+<p>Actualización automática cada 10 segundos.</p>
+<p id="estadoMonitor">Conectando...</p>
+<div class="progress-container">
+			<div id="progressBar" class="progress-bar" style="width: 100%;">Siguiente actualización en: 10 segundos</div>
+		</div>
+<div style="overflow-x:auto;">
+  <table>
+    <thead>
+      <tr>
+        <th>Entrada física</th>
+        <th>Asignación</th>
+        <th>Valor de entrada</th>
+        <th>Nombre</th>
+        <th>Tipo</th>
+        <th>Offset</th>
+        <th>Slope</th>
+        <th>Unidades</th>
+        <th>Valor real</th>
+      </tr>
+    </thead>
+    <tbody id="tablaEntradas">
+      <tr><td colspan="9">Cargando entradas...</td></tr>
+    </tbody>
+  </table>
+</div>
+)rawliteral";
 
     enviarHTML(client, "Monitor", contenido);
 
 client.println(R"rawliteral(
 <script>
+let progress = 100;
+const progressBar = document.getElementById('progressBar');
   async function actualizarEntradas() {
+    progress -= 10;
+    if (progress < 0) {
+    progress = 100;
+    progressBar.textContent = 'Actualizando...';
+	  progressBar.style.color = 'black';
     const estado = document.getElementById('estadoMonitor');
     try {
       const respuesta = await fetch('/api/obtener_entradas', {cache: 'no-store'});
@@ -53,19 +61,24 @@ client.println(R"rawliteral(
               celda.textContent = valor ?? '';
               fila.appendChild(celda);
           });
-          fragmento.appendChild(fila);
+)rawliteral");
+client.println(R"rawliteral(
+      fragmento.appendChild(fila);
       });
       tabla.replaceChildren(fragmento);
       estado.textContent ='Última actualización: ' + new Date().toLocaleTimeString();
-  )rawliteral");
-client.println(R"rawliteral(
+
 } catch (error) {
     estado.textContent = 'Error al consultar las entradas. Se intentará nuevamente en 10 segundos.';
     console.error(error);
     }
+    }
+    progressBar.style.color = 'white';
+    progressBar.style.width = progress + '%';
+    progressBar.textContent = 'Siguiente actualización en: '+ (progress/10) + ' segundos.';
   }
   actualizarEntradas();
-  setInterval(actualizarEntradas, 10000);
+  setInterval(actualizarEntradas, 1000);
 </script>)rawliteral");
 }
 #endif

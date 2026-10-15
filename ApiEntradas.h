@@ -45,13 +45,14 @@ inline void obtener_entradas(EthernetClient &client) {
         entrada["unidades"] = config.unidades;
         entrada["valor_real"] = (valor - config.offset) * config.slope;
     }
-
     client.println("HTTP/1.1 200 OK");
     client.println("Content-Type: application/json; charset=UTF-8");
     client.println("Cache-Control: no-store");
+    client.println("Access-Control-Allow-Origin: *");
+    client.println("Access-Control-Allow-Methods: GET, OPTIONS");
+    client.println("Access-Control-Allow-Headers: Content-Type");
     client.println("Connection: close");
     client.println();
-
     serializeJson(doc, client);
 }
 #endif

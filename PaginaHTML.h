@@ -46,6 +46,11 @@ inline void enviarHTML(EthernetClient &client, const char* titulo, const String&
   client.println(".tabla-bonita tbody tr:last-child td { border-bottom: none; }");
   client.println(".progress-container { width: 100%; height: 24px; background: #e5e7eb; border-radius: 12px; overflow: hidden; }");
   client.println(".progress-bar { height: 100%; width: 0%; background: #1976d2; color: white; text-align: center; line-height: 24px; font-size: 12px; font-weight: bold; transition: width 0.3s ease; }");
+  client.println("table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem; }");
+  client.println("th { color: #00a2ff; font-weight: 600; padding: 12px 16px; border-bottom: 2px solid #334155; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; }");
+  client.println("td { padding: 14px 16px; color: #ffffff; border-bottom: 1px solid #334155; }");
+  client.println("tbody tr:hover { background-color: #283548; transition: background-color 0.2s ease-in-out; }");
+  client.println("tbody tr:last-child td { border-bottom: none; }");
   client.println("</style>");
 
   client.println("</head>");
