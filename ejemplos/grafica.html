@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Gráfica</title>
+<style>
+body { font-family: Arial; margin: 20px; }
+canvas { width: 100%; max-width: 800px; height: 400px; border: 1px solid #ccc; }
+</style>
+</head>
+<body>
+
+<h2>Gráfica en tiempo real</h2>
+<p>Valor actual: <strong id="valor">0</strong></p>
+<canvas id="grafica" width="800" height="400"></canvas>
+
+<script>
+const canvas = document.getElementById("grafica");
+const ctx = canvas.getContext("2d");
+const etiqueta = document.getElementById("valor");
+const maxPuntos = 60;
+const datos = [];
+
+function generarValor() {
+    return Math.floor(Math.random() * 101);
+}
+
+function dibujar() {
+    const ancho = canvas.width;
+    const alto = canvas.height;
+    const izq = 40, der = 10, sup = 20, inf = 30;
+    const anchoGrafica = ancho - izq - der;
+    const altoGrafica = alto - sup - inf;
+
+    ctx.clearRect(0, 0, ancho, alto);
+    ctx.font = "12px Arial";
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    ctx.strokeStyle = "#e5e5e5";
+    ctx.fillStyle = "#555";
+    ctx.lineWidth = 1;
+
+    for (let v = 0; v <= 100; v += 20) {
+        const y = sup + altoGrafica * (1 - v / 100);
+        ctx.beginPath();
+        ctx.moveTo(izq, y);
+        ctx.lineTo(ancho - der, y);
+        ctx.stroke();
+        ctx.fillText(v, izq - 8, y);
+    }
+
+    ctx.strokeStyle = "#333";
+    ctx.beginPath();
+    ctx.moveTo(izq, sup);
+    ctx.lineTo(izq, alto - inf);
+    ctx.lineTo(ancho - der, alto - inf);
+    ctx.stroke();
+
+    const paso = anchoGrafica / (maxPuntos - 1);
+
+    ctx.strokeStyle = "#007bff";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+
+    datos.forEach((v, i) => {
+        const x = izq + i * paso;
+        const y = sup + altoGrafica * (1 - v / 100);
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+
+    ctx.stroke();
+
+    datos.forEach((v, i) => {
+        const x = izq + i * paso;
+        const y = sup + altoGrafica * (1 - v / 100);
+        ctx.fillStyle = "#007bff";
+        ctx.beginPath();
+        ctx.arc(x, y, 3, 0, Math.PI * 2);
+        ctx.fill();
+    });
+}
+
+function actualizar() {
+    const valor = generarValor();
+    datos.push(valor);
+
+    if (datos.length > maxPuntos) datos.shift();
+
+    etiqueta.textContent = valor;
+    dibujar();
+}
+
+actualizar();
+setInterval(actualizar, 1000);
+</script>
+
+</body>
+</html>
